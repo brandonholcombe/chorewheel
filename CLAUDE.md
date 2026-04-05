@@ -36,6 +36,27 @@ When you change project state that a symbol tracks:
 
 ---
 
+## Review Gate
+
+A PreToolUse hook (`.claude/hooks/require-review.sh`) enforces **review before implementation**. When active task documents exist in `Agents/TODO/Active/`, source file edits (`src/`, `k8s/`, `scripts/`, `config/`) are blocked until a corresponding review report exists in `Agents/Review-reports/`.
+
+### Workflow
+
+1. Create a task document in `Agents/TODO/Active/` with `## Status: Not Started`
+2. Draft your implementation plan
+3. Write a review report in `Agents/Review-reports/` that references the task filename
+4. Implement (hook now allows source file edits)
+5. Mark the task `## Status: Complete` when done
+
+### Conventions
+
+- Review reports must reference the task filename (e.g., `my-task.md`) in their body
+- Tasks with `## Status: Complete` (case-insensitive) are skipped by the gate
+- Ad-hoc work without task documents is not gated
+- Non-source files (Agents/, docs/, .claude/) are always allowed
+
+---
+
 ## Project-Specific Instructions
 
 <!-- Add your project-specific Claude Code instructions below this line -->
