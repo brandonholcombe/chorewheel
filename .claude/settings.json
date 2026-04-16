@@ -6,7 +6,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 scripts/align.py check --quiet 2>&1 || true"
+            "command": "bash .claude/hooks/check-alignment.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/require-review.sh"
           }
         ]
       }

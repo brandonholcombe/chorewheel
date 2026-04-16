@@ -42,15 +42,21 @@ A PreToolUse hook (`.claude/hooks/require-review.sh`) enforces **review before i
 
 ### Workflow
 
-1. Create a task document in `Agents/TODO/Active/` with `## Status: Not Started`
+1. Create a task document in `Agents/TODO/Active/` with `## Author: <your-name>` and `## Status: Not Started`
 2. Draft your implementation plan
-3. Write a review report in `Agents/Review-reports/` that references the task filename
+3. A **different agent** writes a review report in `Agents/Review-reports/` with `## Reviewer: <their-name>`, referencing the task filename
 4. Implement (hook now allows source file edits)
 5. Mark the task `## Status: Complete` when done
 
+### Independent Review Rule
+
+**Agents cannot review their own work.** The `## Author:` field in the task must differ from the `## Reviewer:` field in the review report. If they match, the review gate will deny the edit as a self-review. Both fields are required.
+
 ### Conventions
 
-- Review reports must reference the task filename (e.g., `my-task.md`) in their body
+- Task documents must include `## Author: <agent-name>`
+- Review reports must include `## Reviewer: <agent-name>` and reference the task filename (e.g., `my-task.md`) in their body
+- Author and Reviewer must be different agents
 - Tasks with `## Status: Complete` (case-insensitive) are skipped by the gate
 - Ad-hoc work without task documents is not gated
 - Non-source files (Agents/, docs/, .claude/) are always allowed
