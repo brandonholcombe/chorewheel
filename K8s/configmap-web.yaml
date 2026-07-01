@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: chorewheel-web-config
+  namespace: chorewheel
+  labels:
+    app: chorewheel-web
+data:
+  # Non-secret env. Secrets (APP_SESSION_SECRET, AUTH_GOOGLE_SECRET) live in the
+  # SealedSecret. Google client id is not secret.
+  AUTH_GOOGLE_ID: "16642393608-so5se16mq529n0j80limkvaan948af2j.apps.googleusercontent.com"
+  APP_DOMAIN: "https://chores.kodloki.io"
+  DATABASE_PATH: "/data/chorewheel.sqlite"
+  # Auth.js v5 self-hosted behind nginx ingress.
+  AUTH_URL: "https://chores.kodloki.io"
+  AUTH_TRUST_HOST: "true"

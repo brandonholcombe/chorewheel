@@ -1,15 +1,15 @@
 {
   "version": "1.0.0",
   "project": {
-    "name": "my-project",
-    "intent": "Describe what this project does"
+    "name": "chorewheel",
+    "intent": "Household chore monitoring system: a Next.js webapp plus a Raspberry Pi kiosk display showing each chore's freshness and who last completed it. Google sign-in, household-scoped membership, deployed on the kodloki.io Linode LKE cluster."
   },
   "symbols": {
     "architecture": {
       "description": "Core system architecture and provider decisions",
       "docs": ["docs/architecture.md"],
       "properties": {
-        "provider": "akamai",
+        "provider": "linode",
         "schema_version": 3
       },
       "interlocks": {}
@@ -18,7 +18,7 @@
       "description": "Deployment targets and infrastructure requirements",
       "docs": ["docs/deployment.md"],
       "properties": {
-        "expects_provider": "akamai",
+        "expects_provider": "linode",
         "expects_schema": 3
       },
       "interlocks": {

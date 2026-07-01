@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: chorewheel-web
+  namespace: chorewheel
+  labels:
+    app: chorewheel-web
+spec:
+  serviceName: chorewheel-web
+  replicas: 1
+  selector:
+    matchLabels:
+      app: chorewheel-web
+  template:
+    metadata:
+      labels:
+        app: chorewheel-web
+    spec:
+      securityContext:
+        fsGroup: 1000
+      containers:
+        - name: chorewheel-web
+          # Image tag is set by the build+push step (git sha). ArgoCD syncs this.
+          image: bholcombe/chorewheel-web:7779ab2-1776314064
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 3000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: chorewheel-web-config
+            - secretRef:
+                name: chorewheel-web-secret
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 3
+            failureThreshold: 3
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: false
+            capabilities:
+              drop:
+                - ALL
+      restartPolicy: Always
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        storageClassName: linode-block-storage-retain
+        resources:
+          requests:
+            storage: 5Gi

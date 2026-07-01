@@ -1,11 +1,11 @@
 {
-  "root": "bd325b5ac420c28e",
-  "generated": "2026-03-10T00:28:52Z",
+  "root": "6527916e636ef15d",
+  "generated": "2026-06-04T01:16:16Z",
   "status": "aligned",
   "symbols": {
     "architecture": {
-      "hash": "e844bb185f438c14",
-      "means": "architecture: provider=akamai, schema_version=3",
+      "hash": "e8a554597f99bbe6",
+      "means": "architecture: provider=linode, schema_version=3",
       "docs": {
         "docs/architecture.md": {
           "hash": "5c6ba121447020b0",
@@ -15,8 +15,8 @@
       "interlocks": {}
     },
     "deployment": {
-      "hash": "fc7a37a922c7f231",
-      "means": "deployment: expects_provider=akamai, expects_schema=3",
+      "hash": "9df7213e2fed0bdc",
+      "means": "deployment: expects_provider=linode, expects_schema=3",
       "docs": {
         "docs/deployment.md": {
           "hash": "df511d990f8e0ae8",
