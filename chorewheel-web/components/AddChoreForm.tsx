@@ -2,12 +2,17 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  CadenceInput,
+  EffortInput,
+  cadenceToMinutes,
+  useChoreForm,
+} from '@/components/ChoreFields';
 
 export function AddChoreForm({ householdId }: { householdId: string }) {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const [name, setName] = useState('');
-  const [cadence, setCadence] = useState('');
+  const { name, setName, cadence, setCadence, effort, setEffort } = useChoreForm({});
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -23,7 +28,8 @@ export function AddChoreForm({ householdId }: { householdId: string }) {
         body: JSON.stringify({
           householdId,
           name: name.trim(),
-          cadenceDays: cadence ? Number(cadence) : null,
+          cadenceMinutes: cadenceToMinutes(cadence),
+          effortMinutes: effort ? Number(effort) : undefined,
         }),
       });
       const data = await res.json().catch(() => ({}));
@@ -32,7 +38,6 @@ export function AddChoreForm({ householdId }: { householdId: string }) {
         return;
       }
       setName('');
-      setCadence('');
       setOpen(false);
       router.refresh();
     } finally {
@@ -44,7 +49,7 @@ export function AddChoreForm({ householdId }: { householdId: string }) {
     return (
       <button
         onClick={() => setOpen(true)}
-        className="rounded-lg border border-dashed border-neutral-300 px-4 py-2 text-sm text-neutral-500 transition hover:border-neutral-400 hover:text-neutral-700 dark:border-neutral-700"
+        className="w-full rounded-2xl border border-dashed border-ink/25 px-4 py-3 text-sm font-semibold text-ink/55 transition hover:border-ink/50 hover:text-ink"
       >
         + Add a chore
       </button>
@@ -52,43 +57,31 @@ export function AddChoreForm({ householdId }: { householdId: string }) {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="space-y-3 rounded-xl border border-neutral-200 bg-white p-4 dark:border-neutral-800 dark:bg-neutral-900"
-    >
-      <div className="flex flex-col gap-2 sm:flex-row">
-        <input
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          placeholder="Chore name"
-          maxLength={120}
-          autoFocus
-          className="flex-1 rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700"
-        />
-        <input
-          value={cadence}
-          onChange={(e) => setCadence(e.target.value.replace(/[^0-9]/g, ''))}
-          placeholder="every N days"
-          inputMode="numeric"
-          className="w-32 rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700"
-        />
+    <form onSubmit={submit} className="geo-card animate-pop-in space-y-3 p-4">
+      <input
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Chore name"
+        maxLength={120}
+        autoFocus
+        className="input-geo"
+      />
+      <div className="flex flex-wrap items-end gap-3">
+        <CadenceInput state={cadence} onChange={setCadence} />
+        <EffortInput minutes={effort} onChange={setEffort} />
       </div>
-      <div className="flex items-center gap-2">
-        <button
-          type="submit"
-          disabled={busy || !name.trim()}
-          className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-40 dark:bg-white dark:text-neutral-900"
-        >
-          Add
+      <div className="flex items-center gap-3 pt-1">
+        <button type="submit" disabled={busy || !name.trim()} className="btn-geo text-sm">
+          Add chore
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
-          className="text-sm text-neutral-500 hover:text-neutral-800"
+          className="text-sm font-semibold text-ink/50 hover:text-ink"
         >
           Cancel
         </button>
-        {error && <span className="text-sm text-red-600">{error}</span>}
+        {error && <span className="text-sm font-semibold text-overdue">{error}</span>}
       </div>
     </form>
   );

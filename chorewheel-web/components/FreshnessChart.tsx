@@ -4,10 +4,10 @@ import type { FreshnessStatus } from '@/lib/time';
 // Pure render (no client JS) so it works identically in the Pi kiosk view.
 const ORDER: FreshnessStatus[] = ['overdue', 'due', 'fresh', 'never'];
 const COLOR: Record<FreshnessStatus, string> = {
-  overdue: '#dc2626',
-  due: '#f59e0b',
-  fresh: '#16a34a',
-  never: '#a3a3a3',
+  overdue: '#f04438',
+  due: '#f79009',
+  fresh: '#12b76a',
+  never: '#a1a1aa',
 };
 const LABEL: Record<FreshnessStatus, string> = {
   overdue: 'Overdue',
@@ -24,12 +24,13 @@ export function FreshnessChart({ chores }: { chores: ChoreView[] }) {
   }));
 
   if (total === 0) {
-    return <p className="text-sm text-neutral-400">No chores to track yet.</p>;
+    return <p className="text-sm font-medium text-ink/40">No chores to track yet.</p>;
   }
 
   return (
     <div>
-      <div className="flex h-3 w-full overflow-hidden rounded-full bg-neutral-100 dark:bg-neutral-800">
+      {/* Segmented status bar. */}
+      <div className="flex h-5 w-full overflow-hidden rounded-full border border-ink/15 bg-paper">
         {counts.map(
           ({ status, count }) =>
             count > 0 && (
@@ -41,15 +42,18 @@ export function FreshnessChart({ chores }: { chores: ChoreView[] }) {
             ),
         )}
       </div>
-      <ul className="mt-3 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+      <ul className="mt-4 grid grid-cols-2 gap-2">
         {counts.map(({ status, count }) => (
-          <li key={status} className="flex items-center gap-2">
+          <li
+            key={status}
+            className="flex items-center gap-2 rounded-lg border border-ink/12 bg-paper/60 px-2.5 py-1.5"
+          >
             <span
-              className="h-2.5 w-2.5 rounded-full"
+              className="h-3 w-3 rounded-[4px]"
               style={{ backgroundColor: COLOR[status] }}
             />
-            <span className="text-neutral-500">{LABEL[status]}</span>
-            <span className="ml-auto font-medium tabular-nums">{count}</span>
+            <span className="text-sm font-medium text-ink/70">{LABEL[status]}</span>
+            <span className="ml-auto font-display text-lg font-bold tabular-nums">{count}</span>
           </li>
         ))}
       </ul>

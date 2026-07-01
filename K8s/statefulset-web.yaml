@@ -21,7 +21,7 @@ spec:
       containers:
         - name: chorewheel-web
           # Image tag is set by the build+push step (git sha). ArgoCD syncs this.
-          image: bholcombe/chorewheel-web:7779ab2-1776314064
+          image: bholcombe/chorewheel-web:ui2-1782944931
           imagePullPolicy: Always
           ports:
             - name: http

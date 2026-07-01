@@ -8,7 +8,8 @@ import { requireMembership } from '@/lib/session';
 const patchSchema = z.object({
   name: z.string().trim().min(1).max(120).optional(),
   description: z.string().trim().max(500).nullable().optional(),
-  cadenceDays: z.number().int().positive().max(365).nullable().optional(),
+  cadenceMinutes: z.number().int().min(5).max(525600).nullable().optional(),
+  effortMinutes: z.number().int().min(1).max(1440).optional(),
   archived: z.boolean().optional(),
 });
 

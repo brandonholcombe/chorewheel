@@ -4,8 +4,137 @@
 
 :root {
   color-scheme: light dark;
+  /* Cleaner geometric theme tokens (R G B triplets for rgb(var(--x))). */
+  --ink: 24 24 30; /* near-black — text, thin borders */
+  --paper: 248 247 244; /* soft warm page background */
+  --panel: 255 255 255; /* card surface */
+  --hard: 24 24 30; /* accent shadow color */
 }
 
-body {
-  @apply bg-neutral-50 text-neutral-900 antialiased dark:bg-neutral-950 dark:text-neutral-100;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: 236 236 240;
+    --paper: 12 12 15;
+    --panel: 22 22 27;
+    --hard: 0 0 0;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-paper font-sans text-ink antialiased;
+    min-height: 100vh;
+  }
+
+  /* Animated geometric backdrop — a slowly drifting field of soft color blobs
+     plus a fine dot grid. Sits behind everything; ignores pointer events. */
+  .bg-animated {
+    position: fixed;
+    inset: 0;
+    z-index: -10;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: rgb(var(--paper));
+  }
+  .bg-animated::before,
+  .bg-animated::after {
+    content: '';
+    position: absolute;
+    inset: -25%;
+    background-repeat: no-repeat;
+  }
+  /* Layer 1: three large color blobs that slowly orbit + breathe. */
+  .bg-animated::before {
+    background-image:
+      radial-gradient(28rem 28rem at 20% 30%, rgb(109 74 255 / 0.22), transparent 60%),
+      radial-gradient(26rem 26rem at 80% 25%, rgb(255 92 122 / 0.2), transparent 60%),
+      radial-gradient(30rem 30rem at 55% 80%, rgb(60 201 255 / 0.18), transparent 60%);
+    filter: blur(10px);
+    animation: bg-drift 34s ease-in-out infinite alternate;
+  }
+  /* Layer 2: a fine dot grid that gently pans. */
+  .bg-animated::after {
+    background-image: radial-gradient(circle at center, rgb(var(--ink) / 0.09) 1.3px, transparent 1.5px);
+    background-size: 24px 24px;
+    animation: bg-pan 60s linear infinite;
+    opacity: 0.7;
+  }
+}
+
+@keyframes bg-drift {
+  0% {
+    transform: translate3d(-3%, -2%, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(3%, 2%, 0) scale(1.12);
+  }
+  100% {
+    transform: translate3d(-2%, 3%, 0) scale(1.05);
+  }
+}
+
+@keyframes bg-pan {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 240px 240px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bg-animated::before,
+  .bg-animated::after {
+    animation: none;
+  }
+}
+
+@layer components {
+  /* Clean card: thin border + subtle depth. Plain CSS (not @apply) so the
+     CSS-variable colors with fractional opacity resolve reliably. */
+  .geo-card {
+    border-radius: 1.25rem;
+    border: 1px solid rgb(var(--ink) / 0.12);
+    background-color: rgb(var(--panel) / 0.85);
+    box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+    backdrop-filter: blur(12px);
+  }
+  .geo-card-lg {
+    border-radius: 1.75rem;
+    border: 1px solid rgb(var(--ink) / 0.12);
+    background-color: rgb(var(--panel) / 0.85);
+    box-shadow: 0 4px 10px rgb(0 0 0 / 0.08);
+    backdrop-filter: blur(12px);
+  }
+
+  .btn-geo {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand px-4 py-2
+           font-semibold text-white shadow-sm transition
+           hover:-translate-y-0.5 hover:shadow-md active:translate-y-0
+           disabled:pointer-events-none disabled:opacity-40;
+  }
+  .btn-geo-light {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-panel px-4 py-2
+           font-semibold text-ink shadow-sm transition
+           hover:-translate-y-0.5 hover:shadow-md active:translate-y-0
+           disabled:pointer-events-none disabled:opacity-40;
+    border: 1px solid rgb(var(--ink) / 0.15);
+  }
+
+  .input-geo {
+    @apply w-full rounded-xl bg-panel px-3 py-2 font-medium text-ink outline-none transition;
+    border: 1px solid rgb(var(--ink) / 0.15);
+  }
+  .input-geo::placeholder {
+    color: rgb(var(--ink) / 0.35);
+  }
+  .input-geo:focus {
+    border-color: #6d4aff;
+    box-shadow: 0 0 0 3px rgb(109 74 255 / 0.18);
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-bold uppercase tracking-[0.16em];
+    color: rgb(var(--ink) / 0.45);
+  }
 }

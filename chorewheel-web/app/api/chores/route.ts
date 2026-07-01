@@ -9,7 +9,10 @@ const schema = z.object({
   householdId: z.string().min(1),
   name: z.string().trim().min(1).max(120),
   description: z.string().trim().max(500).optional(),
-  cadenceDays: z.number().int().positive().max(365).nullable().optional(),
+  // Cadence in minutes: from 5 min (very frequent) to 365 days.
+  cadenceMinutes: z.number().int().min(5).max(525600).nullable().optional(),
+  // Estimated effort/time in minutes.
+  effortMinutes: z.number().int().min(1).max(1440).optional(),
 });
 
 export async function POST(req: Request) {
@@ -26,7 +29,8 @@ export async function POST(req: Request) {
     householdId: body.data.householdId,
     name: body.data.name,
     description: body.data.description ?? null,
-    cadenceDays: body.data.cadenceDays ?? null,
+    cadenceMinutes: body.data.cadenceMinutes ?? null,
+    effortMinutes: body.data.effortMinutes,
     createdBy: ctx.user.id,
   });
   return NextResponse.json({ chore }, { status: 201 });

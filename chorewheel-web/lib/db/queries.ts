@@ -37,7 +37,8 @@ export interface Chore {
   household_id: string;
   name: string;
   description: string | null;
-  cadence_days: number | null;
+  cadence_minutes: number | null;
+  effort_minutes: number;
   sort_order: number;
   archived: number;
   created_by: string | null;
@@ -55,6 +56,7 @@ export interface Contribution {
   name: string | null;
   email: string;
   count: number;
+  points: number; // sum of effort_minutes across completions
 }
 
 // ---------------------------------------------------------------------------
@@ -174,7 +176,8 @@ export function createHousehold(
         createChore(conn, {
           householdId,
           name: chore.name,
-          cadenceDays: chore.cadenceDays,
+          cadenceMinutes: chore.cadenceMinutes,
+          effortMinutes: chore.effortMinutes,
           createdBy: userId,
         });
       }
@@ -217,7 +220,8 @@ export interface NewChore {
   householdId: string;
   name: string;
   description?: string | null;
-  cadenceDays?: number | null;
+  cadenceMinutes?: number | null;
+  effortMinutes?: number;
   createdBy: string;
 }
 
@@ -231,15 +235,17 @@ export function createChore(conn: Database, input: NewChore): Chore {
     ).n;
   conn
     .prepare(
-      `INSERT INTO chores (id, household_id, name, description, cadence_days, sort_order, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO chores
+         (id, household_id, name, description, cadence_minutes, effort_minutes, sort_order, created_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .run(
       choreId,
       input.householdId,
       input.name,
       input.description ?? null,
-      input.cadenceDays ?? null,
+      input.cadenceMinutes ?? null,
+      input.effortMinutes ?? 5,
       nextOrder,
       input.createdBy,
     );
@@ -253,7 +259,8 @@ export function getChore(conn: Database, choreId: string): Chore | undefined {
 export interface ChoreUpdate {
   name?: string;
   description?: string | null;
-  cadenceDays?: number | null;
+  cadenceMinutes?: number | null;
+  effortMinutes?: number;
   archived?: boolean;
 }
 
@@ -268,9 +275,13 @@ export function updateChore(conn: Database, choreId: string, patch: ChoreUpdate)
     sets.push('description = @description');
     params.description = patch.description;
   }
-  if (patch.cadenceDays !== undefined) {
-    sets.push('cadence_days = @cadence_days');
-    params.cadence_days = patch.cadenceDays;
+  if (patch.cadenceMinutes !== undefined) {
+    sets.push('cadence_minutes = @cadence_minutes');
+    params.cadence_minutes = patch.cadenceMinutes;
+  }
+  if (patch.effortMinutes !== undefined) {
+    sets.push('effort_minutes = @effort_minutes');
+    params.effort_minutes = patch.effortMinutes;
   }
   if (patch.archived !== undefined) {
     sets.push('archived = @archived');
@@ -311,7 +322,11 @@ export function addCompletion(
     .run(id(), choreId, userId, note ?? null);
 }
 
-/** Per-member completion counts within the last `sinceDays` days. */
+/**
+ * Per-member contribution within the last `sinceDays` days. Ranked by `points`
+ * (sum of each completed chore's effort_minutes); `count` is the raw number of
+ * completions, kept as a secondary metric.
+ */
 export function contributionStats(
   conn: Database,
   householdId: string,
@@ -319,14 +334,16 @@ export function contributionStats(
 ): Contribution[] {
   return conn
     .prepare(
-      `SELECT u.id AS user_id, u.name AS name, u.email AS email, COUNT(*) AS count
+      `SELECT u.id AS user_id, u.name AS name, u.email AS email,
+              COUNT(*) AS count,
+              COALESCE(SUM(c.effort_minutes), 0) AS points
          FROM completions comp
          JOIN chores c ON c.id = comp.chore_id
          JOIN users u ON u.id = comp.user_id
         WHERE c.household_id = ?
           AND comp.completed_at >= datetime('now', ?)
         GROUP BY u.id
-        ORDER BY count DESC, u.name`,
+        ORDER BY points DESC, count DESC, u.name`,
     )
     .all(householdId, `-${sinceDays} days`) as Contribution[];
 }

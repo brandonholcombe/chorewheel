@@ -33,9 +33,11 @@ export function OnboardingForms() {
 
   return (
     <div className="space-y-8">
-      <section className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="mb-1 font-semibold">Create a household</h2>
-        <p className="mb-4 text-sm text-neutral-500">You&apos;ll be its admin.</p>
+      <section className="geo-card p-6">
+        <h2 className="mb-1 font-display text-lg font-black">Create a household</h2>
+        <p className="mb-4 text-sm font-medium text-ink/50">
+          You&apos;ll be its admin — it starts with a few default chores.
+        </p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -48,21 +50,17 @@ export function OnboardingForms() {
             onChange={(e) => setName(e.target.value)}
             placeholder="The Holcombes"
             maxLength={80}
-            className="flex-1 rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm outline-none focus:border-neutral-500 dark:border-neutral-700"
+            className="input-geo flex-1"
           />
-          <button
-            type="submit"
-            disabled={busy || !name.trim()}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-40 dark:bg-white dark:text-neutral-900"
-          >
+          <button type="submit" disabled={busy || !name.trim()} className="btn-geo">
             Create
           </button>
         </form>
       </section>
 
-      <section className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900">
-        <h2 className="mb-1 font-semibold">Join with a code</h2>
-        <p className="mb-4 text-sm text-neutral-500">Ask a member for the invite code.</p>
+      <section className="geo-card p-6">
+        <h2 className="mb-1 font-display text-lg font-black">Join with a code</h2>
+        <p className="mb-4 text-sm font-medium text-ink/50">Ask a member for the invite code.</p>
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -75,19 +73,15 @@ export function OnboardingForms() {
             onChange={(e) => setCode(e.target.value)}
             placeholder="K7Q-M4PX"
             maxLength={32}
-            className="flex-1 rounded-lg border border-neutral-300 bg-transparent px-3 py-2 text-sm uppercase tracking-widest outline-none focus:border-neutral-500 dark:border-neutral-700"
+            className="input-geo flex-1 font-mono uppercase tracking-widest"
           />
-          <button
-            type="submit"
-            disabled={busy || !code.trim()}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-40 dark:bg-white dark:text-neutral-900"
-          >
+          <button type="submit" disabled={busy || !code.trim()} className="btn-geo">
             Join
           </button>
         </form>
       </section>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm font-bold text-overdue">{error}</p>}
     </div>
   );
 }

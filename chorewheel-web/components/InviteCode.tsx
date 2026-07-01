@@ -19,8 +19,9 @@ export function InviteCode({ code }: { code: string }) {
     <button
       onClick={copy}
       title="Copy invite code"
-      className="rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-1.5 font-mono text-sm tracking-widest text-neutral-700 transition hover:bg-neutral-100 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-200"
+      className="inline-flex items-center gap-2 rounded-xl border border-ink/15 bg-sun/70 px-3 py-1.5 font-mono text-sm font-bold tracking-widest text-ink shadow-sm transition hover:-translate-y-0.5 hover:shadow-md active:translate-y-0"
     >
+      <span className="text-[10px] font-black uppercase tracking-normal opacity-60">invite</span>
       {copied ? 'copied!' : code}
     </button>
   );
